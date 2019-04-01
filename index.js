@@ -4,10 +4,10 @@ const os = require('os');
 const fs = require('fs');
 const ini = require('ini');
 
-const readRc = fp => {
+const readRc = filePath => {
 	try {
-		return ini.parse(fs.readFileSync(fp, 'utf8')).prefix;
-	} catch (err) {}
+		return ini.parse(fs.readFileSync(filePath, 'utf8')).prefix;
+	} catch (_) {}
 };
 
 const defaultNpmPrefix = (() => {

@@ -1,27 +1,27 @@
 import test from 'ava';
 import execa from 'execa';
-import m from '.';
+import globalDirs from '.';
 
-console.log(m);
+console.log(globalDirs);
 
-const npm = args => execa.stdout('npm', args);
+const npm = arguments_ => execa.stdout('npm', arguments_);
 
 test('npm.prefix', async t => {
-	t.is(m.npm.prefix, await npm(['prefix', '--global']));
+	t.is(globalDirs.npm.prefix, await npm(['prefix', '--global']));
 });
 
 test('npm.packages', async t => {
-	t.is(m.npm.packages, await npm(['root', '--global']));
+	t.is(globalDirs.npm.packages, await npm(['root', '--global']));
 });
 
 test('npm.binaries', async t => {
-	t.is(m.npm.binaries, await npm(['bin', '--global']));
+	t.is(globalDirs.npm.binaries, await npm(['bin', '--global']));
 });
 
 test('yarn', async t => {
 	await npm(['install', '--global', 'yarn']);
-	t.truthy(m.yarn);
-	t.truthy(m.yarn.prefix);
-	t.truthy(m.yarn.packages);
-	t.truthy(m.yarn.binaries);
+	t.truthy(globalDirs.yarn);
+	t.truthy(globalDirs.yarn.prefix);
+	t.truthy(globalDirs.yarn.packages);
+	t.truthy(globalDirs.yarn.binaries);
 });
