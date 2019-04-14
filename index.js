@@ -52,16 +52,25 @@ const getNpmPrefix = () => {
 
 const npmPrefix = path.resolve(getNpmPrefix());
 
+const getYarnWinDir = () => {
+	if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
+		const dir = path.join(process.env.LOCALAPPDATA, 'Yarn');
+		if (fs.existsSync(dir)) {
+			return dir;
+		}
+	}
+
+	return false;
+};
+
 const getYarnPrefix = () => {
 	if (process.env.PREFIX) {
 		return process.env.PREFIX;
 	}
 
-	if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
-		const prefix = path.join(process.env.LOCALAPPDATA, 'Yarn');
-		if (fs.existsSync(prefix)) {
-			return prefix;
-		}
+	const winPrefix = getYarnWinDir();
+	if (winPrefix) {
+		return winPrefix;
 	}
 
 	const configPrefix = path.join(os.homedir(), '.config/yarn');
@@ -86,5 +95,5 @@ exports.npm.binaries = process.platform === 'win32' ? npmPrefix : path.join(npmP
 const yarnPrefix = path.resolve(getYarnPrefix());
 exports.yarn = {};
 exports.yarn.prefix = yarnPrefix;
-exports.yarn.packages = path.join(yarnPrefix, process.platform === 'win32' ? 'config/global/node_modules' : 'global/node_modules');
+exports.yarn.packages = path.join(yarnPrefix, getYarnWinDir() ? 'Data/global/node_modules' : 'global/node_modules');
 exports.yarn.binaries = path.join(exports.yarn.packages, '.bin');
