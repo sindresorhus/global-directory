@@ -20,7 +20,7 @@ const defaultNpmPrefix = (() => {
 		return path.dirname(process.execPath);
 	}
 
-	// Homebrew special case; always assume /usr/local
+	// Homebrew special case; always assume `/usr/local`
 	if (process.execPath.startsWith('/usr/local/Cellar/node')) {
 		return '/usr/local';
 	}
