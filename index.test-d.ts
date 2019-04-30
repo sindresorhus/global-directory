@@ -1,9 +1,9 @@
 import {expectType} from 'tsd';
-import * as globalDirs from '.';
+import globalDirectories = require('.');
 
-expectType<string>(globalDirs.npm.prefix);
-expectType<string>(globalDirs.npm.packages);
-expectType<string>(globalDirs.npm.binaries);
-expectType<string>(globalDirs.yarn.prefix);
-expectType<string>(globalDirs.yarn.packages);
-expectType<string>(globalDirs.yarn.binaries);
+expectType<string>(globalDirectories.npm.prefix);
+expectType<string>(globalDirectories.npm.packages);
+expectType<string>(globalDirectories.npm.binaries);
+expectType<string>(globalDirectories.yarn.prefix);
+expectType<string>(globalDirectories.yarn.packages);
+expectType<string>(globalDirectories.yarn.binaries);

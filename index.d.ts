@@ -1,54 +1,60 @@
-export interface GlobalDirs {
-	/**
-	Directory with globally installed packages.
+declare namespace globalDirectories {
+	interface GlobalDirectories {
+		/**
+		Directory with globally installed packages.
 
-	Equivalent to `npm root --global`.
-	*/
-	readonly packages: string;
+		Equivalent to `npm root --global`.
+		*/
+		readonly packages: string;
 
-	/**
-	Directory with globally installed binaries.
+		/**
+		Directory with globally installed binaries.
 
-	Equivalent to `npm bin --global`.
-	*/
-	readonly binaries: string;
+		Equivalent to `npm bin --global`.
+		*/
+		readonly binaries: string;
 
-	/**
-	Directory with directories for packages and binaries. You probably want either of the above.
+		/**
+		Directory with directories for packages and binaries. You probably want either of the above.
 
-	Equivalent to `npm prefix --global`.
-	*/
-	readonly prefix: string;
+		Equivalent to `npm prefix --global`.
+		*/
+		readonly prefix: string;
+	}
 }
 
-/**
-Get the directory of globally installed packages and binaries.
+declare const globalDirectories: {
+	/**
+	Get the directory of globally installed packages and binaries.
 
-@example
-```
-import * as globalDirs from 'global-dirs';
+	@example
+	```
+	import * as globalDirectories from 'global-dirs';
 
-console.log(globalDirs.npm.prefix);
-//=> '/usr/local'
+	console.log(globalDirectories.npm.prefix);
+	//=> '/usr/local'
 
-console.log(globalDirs.npm.packages);
-//=> '/usr/local/lib/node_modules'
-```
-*/
-export const npm: GlobalDirs;
+	console.log(globalDirectories.npm.packages);
+	//=> '/usr/local/lib/node_modules'
+	```
+	*/
+	readonly npm: globalDirectories.GlobalDirectories;
 
-/**
-Get the directory of globally installed packages and binaries.
+	/**
+	Get the directory of globally installed packages and binaries.
 
-@example
-```
-import * as globalDirs from 'global-dirs';
+	@example
+	```
+	import * as globalDirectories from 'global-dirs';
 
-console.log(globalDirs.npm.binaries);
-//=> '/usr/local/bin'
+	console.log(globalDirectories.npm.binaries);
+	//=> '/usr/local/bin'
 
-console.log(globalDirs.yarn.packages);
-//=> '/Users/sindresorhus/.config/yarn/global/node_modules'
-```
-*/
-export const yarn: GlobalDirs;
+	console.log(globalDirectories.yarn.packages);
+	//=> '/Users/sindresorhus/.config/yarn/global/node_modules'
+	```
+	*/
+	readonly yarn: globalDirectories.GlobalDirectories;
+}
+
+export = globalDirectories;
