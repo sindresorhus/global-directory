@@ -20,6 +20,11 @@ const defaultNpmPrefix = (() => {
 		return path.dirname(process.execPath);
 	}
 
+	// Homebrew special case; always assume `/usr/local`
+	if (process.execPath.startsWith('/usr/local/Cellar/node')) {
+		return '/usr/local';
+	}
+
 	// `/usr/local/bin/node` → `prefix=/usr/local`
 	return path.dirname(path.dirname(process.execPath));
 })();
@@ -57,16 +62,25 @@ const getNpmPrefix = () => {
 
 const npmPrefix = path.resolve(getNpmPrefix());
 
+const getYarnWindowsDirectory = () => {
+	if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
+		const dir = path.join(process.env.LOCALAPPDATA, 'Yarn');
+		if (fs.existsSync(dir)) {
+			return dir;
+		}
+	}
+
+	return false;
+};
+
 const getYarnPrefix = () => {
 	if (process.env.PREFIX) {
 		return process.env.PREFIX;
 	}
 
-	if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
-		const prefix = path.join(process.env.LOCALAPPDATA, 'Yarn');
-		if (fs.existsSync(prefix)) {
-			return prefix;
-		}
+	const windowsPrefix = getYarnWindowsDirectory();
+	if (windowsPrefix) {
+		return windowsPrefix;
 	}
 
 	const configPrefix = path.join(os.homedir(), '.config/yarn');
@@ -91,5 +105,5 @@ exports.npm.binaries = process.platform === 'win32' ? npmPrefix : path.join(npmP
 const yarnPrefix = path.resolve(getYarnPrefix());
 exports.yarn = {};
 exports.yarn.prefix = yarnPrefix;
-exports.yarn.packages = path.join(yarnPrefix, process.platform === 'win32' ? 'config/global/node_modules' : 'global/node_modules');
+exports.yarn.packages = path.join(yarnPrefix, getYarnWindowsDirectory() ? 'Data/global/node_modules' : 'global/node_modules');
 exports.yarn.binaries = path.join(exports.yarn.packages, '.bin');

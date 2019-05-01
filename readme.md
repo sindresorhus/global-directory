@@ -15,25 +15,25 @@ $ npm install global-dirs
 ## Usage
 
 ```js
-const globalDirs = require('global-dirs');
+const globalDirectories = require('global-dirs');
 
-console.log(globalDirs.npm.prefix);
+console.log(globalDirectories.npm.prefix);
 //=> '/usr/local'
 
-console.log(globalDirs.npm.packages);
+console.log(globalDirectories.npm.packages);
 //=> '/usr/local/lib/node_modules'
 
-console.log(globalDirs.npm.binaries);
+console.log(globalDirectories.npm.binaries);
 //=> '/usr/local/bin'
 
-console.log(globalDirs.yarn.packages);
+console.log(globalDirectories.yarn.packages);
 //=> '/Users/sindresorhus/.config/yarn/global/node_modules'
 ```
 
 
 ## API
 
-### globalDirs
+### globalDirectories
 
 #### npm
 #### yarn
