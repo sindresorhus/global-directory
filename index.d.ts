@@ -29,7 +29,7 @@ declare const globalDirectories: {
 
 	@example
 	```
-	import * as globalDirectories from 'global-dirs';
+	import globalDirectories = require('global-dirs');
 
 	console.log(globalDirectories.npm.prefix);
 	//=> '/usr/local'
@@ -45,7 +45,7 @@ declare const globalDirectories: {
 
 	@example
 	```
-	import * as globalDirectories from 'global-dirs';
+	import globalDirectories = require('global-dirs');
 
 	console.log(globalDirectories.npm.binaries);
 	//=> '/usr/local/bin'
