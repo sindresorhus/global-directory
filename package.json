@@ -47,6 +47,7 @@
 	"devDependencies": {
 		"ava": "^1.4.1",
 		"execa": "^1.0.0",
+		"import-fresh": "^3.0.0",
 		"xo": "^0.24.0"
 	}
 }
