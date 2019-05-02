@@ -34,6 +34,11 @@ const getNpmPrefix = () => {
 		return process.env.PREFIX;
 	}
 
+	const envNpmPrefixes = Object.keys(process.env).filter(key => key.toLowerCase() === 'npm_config_prefix');
+	if (envNpmPrefixes.length > 0) {
+		return process.env[envNpmPrefixes.slice(-1)[0]];
+	}
+
 	const homePrefix = readRc(path.join(os.homedir(), '.npmrc'));
 	if (homePrefix) {
 		return homePrefix;
