@@ -2,7 +2,7 @@ import test from 'ava';
 import execa from 'execa';
 import importFresh from 'import-fresh';
 
-let globalDirectories = importFresh('.');
+const globalDirectories = importFresh('.');
 
 console.log(globalDirectories);
 
@@ -31,6 +31,6 @@ test('yarn', async t => {
 test('reload package and get npm.prefix with env', t => {
 	// eslint-disable-next-line camelcase
 	process.env.npm_config_PREFIX = '/usr/local/lib';
-	globalDirectories = importFresh('.');
+	const globalDirectories = importFresh('.');
 	t.is(globalDirectories.npm.prefix, '/usr/local/lib');
 });
