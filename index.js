@@ -4,39 +4,54 @@ const os = require('os');
 const fs = require('fs');
 const ini = require('ini');
 
+const isWindows = process.platform === 'win32';
+
 const readRc = filePath => {
 	try {
 		return ini.parse(fs.readFileSync(filePath, 'utf8')).prefix;
 	} catch (_) {}
 };
 
-const defaultNpmPrefix = (() => {
+const getEnvNpmPrefix = () => {
 	if (process.env.PREFIX) {
 		return process.env.PREFIX;
 	}
 
-	if (process.platform === 'win32') {
+	return Object.keys(process.env).reduce((prefix, name) => {
+		return (/^npm_config_prefix$/i).test(name) ? process.env[name] : prefix;
+	}, undefined);
+};
+
+const getGlobalNpmrc = () => {
+	if (isWindows && process.env.APPDATA) {
+		// Hardcoded contents of `c:\Program Files\nodejs\node_modules\npm\npmrc`
+		const npmrc = path.join(process.env.APPDATA, '/npm/etc/npmrc');
+		if (fs.existsSync(npmrc)) {
+			return npmrc;
+		}
+	}
+
+	// Homebrew special case: `$(brew --prefix)/lib/node_modules/npm/npmrc`
+	const homebrewPrefix = '/usr/local';
+	if (process.execPath.startsWith(path.join(homebrewPrefix, '/Cellar/node'))) {
+		return path.join(homebrewPrefix, '/lib/node_modules/npm/npmrc');
+	}
+};
+
+const getDefaultNpmPrefix = () => {
+	if (isWindows) {
 		// `c:\node\node.exe` → `prefix=c:\node\`
 		return path.dirname(process.execPath);
 	}
 
-	// Homebrew special case; always assume `/usr/local`
-	if (process.execPath.startsWith('/usr/local/Cellar/node')) {
-		return '/usr/local';
-	}
-
 	// `/usr/local/bin/node` → `prefix=/usr/local`
 	return path.dirname(path.dirname(process.execPath));
-})();
+};
 
 const getNpmPrefix = () => {
-	if (process.env.PREFIX) {
-		return process.env.PREFIX;
-	}
-
-	const envNpmPrefixes = Object.keys(process.env).filter(key => key.toLowerCase() === 'npm_config_prefix');
-	if (envNpmPrefixes.length > 0) {
-		return process.env[envNpmPrefixes.slice(-1)[0]];
+	const envPrefix = getEnvNpmPrefix();
+	if (envPrefix) {
+		return envPrefix;
 	}
 
 	const homePrefix = readRc(path.join(os.homedir(), '.npmrc'));
@@ -44,26 +59,19 @@ const getNpmPrefix = () => {
 		return homePrefix;
 	}
 
-	const globalConfigPrefix = readRc(path.resolve(defaultNpmPrefix, 'etc', 'npmrc'));
-	if (globalConfigPrefix) {
-		return globalConfigPrefix;
+	const globalNpmrc = getGlobalNpmrc();
+	if (globalNpmrc) {
+		const globalPrefix = readRc(globalNpmrc);
+		return globalPrefix;
 	}
 
-	if (process.platform === 'win32' && process.env.APPDATA) {
-		// Hardcoded contents of `c:\Program Files\nodejs\node_modules\npm\.npmrc`
-		const prefix = path.join(process.env.APPDATA, 'npm');
-		if (fs.existsSync(prefix)) {
-			return prefix;
-		}
-	}
-
-	return defaultNpmPrefix;
+	return getDefaultNpmPrefix();
 };
 
 const npmPrefix = path.resolve(getNpmPrefix());
 
 const getYarnWindowsDirectory = () => {
-	if (process.platform === 'win32' && process.env.LOCALAPPDATA) {
+	if (isWindows && process.env.LOCALAPPDATA) {
 		const dir = path.join(process.env.LOCALAPPDATA, 'Yarn');
 		if (fs.existsSync(dir)) {
 			return dir;
