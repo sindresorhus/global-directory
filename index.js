@@ -13,10 +13,6 @@ const readRc = filePath => {
 };
 
 const getEnvNpmPrefix = () => {
-	if (process.env.PREFIX) {
-		return process.env.PREFIX;
-	}
-
 	return Object.keys(process.env).reduce((prefix, name) => {
 		return (/^npm_config_prefix$/i).test(name) ? process.env[name] : prefix;
 	}, undefined);
@@ -25,16 +21,18 @@ const getEnvNpmPrefix = () => {
 const getGlobalNpmrc = () => {
 	if (isWindows && process.env.APPDATA) {
 		// Hardcoded contents of `c:\Program Files\nodejs\node_modules\npm\npmrc`
-		const npmrc = path.join(process.env.APPDATA, '/npm/etc/npmrc');
-		if (fs.existsSync(npmrc)) {
-			return npmrc;
-		}
+		return path.join(process.env.APPDATA, '/npm/etc/npmrc');
 	}
 
 	// Homebrew special case: `$(brew --prefix)/lib/node_modules/npm/npmrc`
 	if (process.execPath.endsWith('/Cellar/node')) {
 		const homebrewPrefix = path.dirname(path.dirname(process.execPath));
 		return path.join(homebrewPrefix, '/lib/node_modules/npm/npmrc');
+	}
+
+	if (process.execPath.endsWith('/bin/node')) {
+		const installDir = path.dirname(path.dirname(process.execPath));
+		return path.join(installDir, '/etc/npmrc');
 	}
 };
 
@@ -57,6 +55,10 @@ const getNpmPrefix = () => {
 	const homePrefix = readRc(path.join(os.homedir(), '.npmrc'));
 	if (homePrefix) {
 		return homePrefix;
+	}
+
+	if (process.env.PREFIX) {
+		return process.env.PREFIX;
 	}
 
 	const globalPrefix = readRc(getGlobalNpmrc());
