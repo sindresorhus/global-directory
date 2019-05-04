@@ -59,9 +59,8 @@ const getNpmPrefix = () => {
 		return homePrefix;
 	}
 
-	const globalNpmrc = getGlobalNpmrc();
-	if (globalNpmrc) {
-		const globalPrefix = readRc(globalNpmrc);
+	const globalPrefix = readRc(getGlobalNpmrc());
+	if (globalPrefix) {
 		return globalPrefix;
 	}
 
@@ -107,8 +106,8 @@ const getYarnPrefix = () => {
 
 exports.npm = {};
 exports.npm.prefix = npmPrefix;
-exports.npm.packages = path.join(npmPrefix, process.platform === 'win32' ? 'node_modules' : 'lib/node_modules');
-exports.npm.binaries = process.platform === 'win32' ? npmPrefix : path.join(npmPrefix, 'bin');
+exports.npm.packages = path.join(npmPrefix, isWindows ? 'node_modules' : 'lib/node_modules');
+exports.npm.binaries = isWindows ? npmPrefix : path.join(npmPrefix, 'bin');
 
 const yarnPrefix = path.resolve(getYarnPrefix());
 exports.yarn = {};
