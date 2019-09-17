@@ -6,7 +6,10 @@ const globalDirectories = importFresh('.');
 
 console.log(globalDirectories);
 
-const npm = arguments_ => execa.stdout('npm', arguments_);
+const npm = async arguments_ => {
+	const {stdout} = await execa('npm', arguments_);
+	return stdout;
+};
 
 test('npm.prefix', async t => {
 	t.is(globalDirectories.npm.prefix, await npm(['prefix', '--global']));
