@@ -25,8 +25,8 @@ const getGlobalNpmrc = () => {
 	}
 
 	// Homebrew special case: `$(brew --prefix)/lib/node_modules/npm/npmrc`
-	if (process.execPath.endsWith('/Cellar/node')) {
-		const homebrewPrefix = path.dirname(path.dirname(process.execPath));
+	if (process.execPath.includes('/Cellar/node')) {
+		const homebrewPrefix = process.execPath.slice(0, process.execPath.indexOf('/Cellar/node'));
 		return path.join(homebrewPrefix, '/lib/node_modules/npm/npmrc');
 	}
 
