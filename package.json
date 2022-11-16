@@ -1,6 +1,6 @@
 {
 	"name": "global-dirs",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Get the directory of globally installed packages and binaries",
 	"license": "MIT",
 	"repository": "sindresorhus/global-dirs",
