@@ -40,8 +40,9 @@ const getGlobalNpmrc = () => {
 
 const getDefaultNpmPrefix = () => {
 	if (isWindows) {
+		const {APPDATA} = process.env;
 		// `c:\node\node.exe` → `prefix=c:\node\`
-		return path.dirname(process.execPath);
+		return APPDATA ? path.join(APPDATA, 'npm') : path.dirname(process.execPath);
 	}
 
 	// `/usr/local/bin/node` → `prefix=/usr/local`
