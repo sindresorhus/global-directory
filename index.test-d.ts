@@ -1,5 +1,5 @@
 import {expectType} from 'tsd';
-import globalDirectories = require('.');
+import globalDirectories from './index.js';
 
 expectType<string>(globalDirectories.npm.prefix);
 expectType<string>(globalDirectories.npm.packages);

@@ -10,8 +10,14 @@
 		"email": "sindresorhus@gmail.com",
 		"url": "https://sindresorhus.com"
 	},
+	"type": "module",
+	"exports": {
+		"types": "./index.d.ts",
+		"default": "./index.js"
+	},
+	"sideEffects": false,
 	"engines": {
-		"node": ">=10"
+		"node": ">=18"
 	},
 	"scripts": {
 		"test": "xo && ava && tsd"
@@ -44,13 +50,12 @@
 		"resolve"
 	],
 	"dependencies": {
-		"ini": "2.0.0"
+		"ini": "4.1.1"
 	},
 	"devDependencies": {
-		"ava": "^2.4.0",
-		"execa": "^5.0.0",
-		"import-fresh": "^3.3.0",
-		"tsd": "^0.14.0",
-		"xo": "^0.37.1"
+		"ava": "^5.3.1",
+		"execa": "^8.0.1",
+		"tsd": "^0.29.0",
+		"xo": "^0.56.0"
 	}
 }

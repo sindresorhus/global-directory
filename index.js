@@ -1,8 +1,8 @@
-'use strict';
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-const ini = require('ini');
+import process from 'node:process';
+import path from 'node:path';
+import os from 'node:os';
+import fs from 'node:fs';
+import ini from 'ini';
 
 const isWindows = process.platform === 'win32';
 
@@ -12,13 +12,9 @@ const readRc = filePath => {
 	} catch {}
 };
 
-const getEnvNpmPrefix = () => {
-	// TODO: Remove the `.reduce` call.
-	// eslint-disable-next-line unicorn/no-array-reduce
-	return Object.keys(process.env).reduce((prefix, name) => {
-		return /^npm_config_prefix$/i.test(name) ? process.env[name] : prefix;
-	}, undefined);
-};
+// TODO: Remove the `.reduce` call.
+// eslint-disable-next-line unicorn/no-array-reduce
+const getEnvNpmPrefix = () => Object.keys(process.env).reduce((prefix, name) => /^npm_config_prefix$/i.test(name) ? process.env[name] : prefix, undefined);
 
 const getGlobalNpmrc = () => {
 	if (isWindows && process.env.APPDATA) {
@@ -109,13 +105,17 @@ const getYarnPrefix = () => {
 	return npmPrefix;
 };
 
-exports.npm = {};
-exports.npm.prefix = npmPrefix;
-exports.npm.packages = path.join(npmPrefix, isWindows ? 'node_modules' : 'lib/node_modules');
-exports.npm.binaries = isWindows ? npmPrefix : path.join(npmPrefix, 'bin');
+const globalDirectories = {};
+
+globalDirectories.npm = {};
+globalDirectories.npm.prefix = npmPrefix;
+globalDirectories.npm.packages = path.join(npmPrefix, isWindows ? 'node_modules' : 'lib/node_modules');
+globalDirectories.npm.binaries = isWindows ? npmPrefix : path.join(npmPrefix, 'bin');
 
 const yarnPrefix = path.resolve(getYarnPrefix());
-exports.yarn = {};
-exports.yarn.prefix = yarnPrefix;
-exports.yarn.packages = path.join(yarnPrefix, getYarnWindowsDirectory() ? 'Data/global/node_modules' : 'global/node_modules');
-exports.yarn.binaries = path.join(exports.yarn.packages, '.bin');
+globalDirectories.yarn = {};
+globalDirectories.yarn.prefix = yarnPrefix;
+globalDirectories.yarn.packages = path.join(yarnPrefix, getYarnWindowsDirectory() ? 'Data/global/node_modules' : 'global/node_modules');
+globalDirectories.yarn.binaries = path.join(globalDirectories.yarn.packages, '.bin');
+
+export default globalDirectories;

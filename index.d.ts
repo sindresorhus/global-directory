@@ -1,27 +1,25 @@
-declare namespace globalDirectories {
-	interface GlobalDirectories {
-		/**
-		Directory with globally installed packages.
+export type GlobalDirectories = {
+	/**
+	Directory with globally installed packages.
 
-		Equivalent to `npm root --global`.
-		*/
-		readonly packages: string;
+	Equivalent to `npm root --global`.
+	*/
+	readonly packages: string;
 
-		/**
-		Directory with globally installed binaries.
+	/**
+	Directory with globally installed binaries.
 
-		Equivalent to `npm bin --global`.
-		*/
-		readonly binaries: string;
+	Equivalent to `npm bin --global`.
+	*/
+	readonly binaries: string;
 
-		/**
-		Directory with directories for packages and binaries. You probably want either of the above.
+	/**
+	Directory with directories for packages and binaries. You probably want either of the above.
 
-		Equivalent to `npm prefix --global`.
-		*/
-		readonly prefix: string;
-	}
-}
+	Equivalent to `npm prefix --global`.
+	*/
+	readonly prefix: string;
+};
 
 declare const globalDirectories: {
 	/**
@@ -29,7 +27,7 @@ declare const globalDirectories: {
 
 	@example
 	```
-	import globalDirectories = require('global-dirs');
+	import globalDirectories from 'global-dirs';
 
 	console.log(globalDirectories.npm.prefix);
 	//=> '/usr/local'
@@ -38,14 +36,14 @@ declare const globalDirectories: {
 	//=> '/usr/local/lib/node_modules'
 	```
 	*/
-	readonly npm: globalDirectories.GlobalDirectories;
+	readonly npm: GlobalDirectories;
 
 	/**
 	Get the directory of globally installed packages and binaries.
 
 	@example
 	```
-	import globalDirectories = require('global-dirs');
+	import globalDirectories from 'global-dirs';
 
 	console.log(globalDirectories.npm.binaries);
 	//=> '/usr/local/bin'
@@ -54,7 +52,7 @@ declare const globalDirectories: {
 	//=> '/Users/sindresorhus/.config/yarn/global/node_modules'
 	```
 	*/
-	readonly yarn: globalDirectories.GlobalDirectories;
+	readonly yarn: GlobalDirectories;
 };
 
-export = globalDirectories;
+export default globalDirectories;
