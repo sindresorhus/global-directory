@@ -1,4 +1,4 @@
-# global-dirs
+# global-directory
 
 > Get the directory of globally installed packages and binaries
 
@@ -7,7 +7,7 @@ Uses the same resolution logic as `npm` and `yarn`.
 ## Install
 
 ```sh
-npm install global-dirs
+npm install global-directory
 ```
 
 ## Usage
