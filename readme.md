@@ -13,43 +13,43 @@ npm install global-dirs
 ## Usage
 
 ```js
-import globalDirectories from 'global-dirs';
+import globalDirectory from 'global-directory';
 
-console.log(globalDirectories.npm.prefix);
+console.log(globalDirectory.npm.prefix);
 //=> '/usr/local'
 
-console.log(globalDirectories.npm.packages);
+console.log(globalDirectory.npm.packages);
 //=> '/usr/local/lib/node_modules'
 
-console.log(globalDirectories.npm.binaries);
+console.log(globalDirectory.npm.binaries);
 //=> '/usr/local/bin'
 
-console.log(globalDirectories.yarn.packages);
+console.log(globalDirectory.yarn.packages);
 //=> '/Users/sindresorhus/.config/yarn/global/node_modules'
 ```
 
 ## API
 
-### globalDirectories
+### globalDirectory
 
 #### npm
 #### yarn
 
 ##### packages
 
-Directory with globally installed packages.
+The directory with globally installed packages.
 
 Equivalent to `npm root --global`.
 
 ##### binaries
 
-Directory with globally installed binaries.
+The directory with globally installed binaries.
 
 Equivalent to `npm bin --global`.
 
 ##### prefix
 
-Directory with directories for packages and binaries. You probably want either of the above.
+The directory with directories for packages and binaries. You probably want either of the above.
 
 Equivalent to `npm prefix --global`.
 

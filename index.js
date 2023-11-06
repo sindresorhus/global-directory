@@ -105,17 +105,17 @@ const getYarnPrefix = () => {
 	return npmPrefix;
 };
 
-const globalDirectories = {};
+const globalDirectory = {};
 
-globalDirectories.npm = {};
-globalDirectories.npm.prefix = npmPrefix;
-globalDirectories.npm.packages = path.join(npmPrefix, isWindows ? 'node_modules' : 'lib/node_modules');
-globalDirectories.npm.binaries = isWindows ? npmPrefix : path.join(npmPrefix, 'bin');
+globalDirectory.npm = {};
+globalDirectory.npm.prefix = npmPrefix;
+globalDirectory.npm.packages = path.join(npmPrefix, isWindows ? 'node_modules' : 'lib/node_modules');
+globalDirectory.npm.binaries = isWindows ? npmPrefix : path.join(npmPrefix, 'bin');
 
 const yarnPrefix = path.resolve(getYarnPrefix());
-globalDirectories.yarn = {};
-globalDirectories.yarn.prefix = yarnPrefix;
-globalDirectories.yarn.packages = path.join(yarnPrefix, getYarnWindowsDirectory() ? 'Data/global/node_modules' : 'global/node_modules');
-globalDirectories.yarn.binaries = path.join(globalDirectories.yarn.packages, '.bin');
+globalDirectory.yarn = {};
+globalDirectory.yarn.prefix = yarnPrefix;
+globalDirectory.yarn.packages = path.join(yarnPrefix, getYarnWindowsDirectory() ? 'Data/global/node_modules' : 'global/node_modules');
+globalDirectory.yarn.binaries = path.join(globalDirectory.yarn.packages, '.bin');
 
-export default globalDirectories;
+export default globalDirectory;

@@ -1,9 +1,9 @@
 {
-	"name": "global-dirs",
+	"name": "global-directory",
 	"version": "3.0.1",
 	"description": "Get the directory of globally installed packages and binaries",
 	"license": "MIT",
-	"repository": "sindresorhus/global-dirs",
+	"repository": "sindresorhus/global-directory",
 	"funding": "https://github.com/sponsors/sindresorhus",
 	"author": {
 		"name": "Sindre Sorhus",

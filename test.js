@@ -5,9 +5,9 @@ import {execa} from 'execa';
 
 const importFresh = async moduleName => import(`${moduleName}?${Date.now()}`);
 
-const {default: globalDirectories} = await importFresh('./index.js');
+const {default: globalDirectory} = await importFresh('./index.js');
 
-console.log(globalDirectories);
+console.log(globalDirectory);
 
 const npm = async arguments_ => {
 	const {stdout} = await execa('npm', arguments_);
@@ -15,28 +15,28 @@ const npm = async arguments_ => {
 };
 
 test('npm.prefix', async t => {
-	t.is(globalDirectories.npm.prefix, await npm(['prefix', '--global']));
+	t.is(globalDirectory.npm.prefix, await npm(['prefix', '--global']));
 });
 
 test('npm.packages', async t => {
-	t.is(globalDirectories.npm.packages, await npm(['root', '--global']));
+	t.is(globalDirectory.npm.packages, await npm(['root', '--global']));
 });
 
 test('npm.binaries', async t => {
-	t.is(globalDirectories.npm.binaries, path.join(await npm(['prefix', '--global']), 'bin'));
+	t.is(globalDirectory.npm.binaries, path.join(await npm(['prefix', '--global']), 'bin'));
 });
 
 test('yarn', async t => {
 	await npm(['install', '--global', 'yarn']);
-	t.truthy(globalDirectories.yarn);
-	t.truthy(globalDirectories.yarn.prefix);
-	t.truthy(globalDirectories.yarn.packages);
-	t.truthy(globalDirectories.yarn.binaries);
+	t.truthy(globalDirectory.yarn);
+	t.truthy(globalDirectory.yarn.prefix);
+	t.truthy(globalDirectory.yarn.packages);
+	t.truthy(globalDirectory.yarn.binaries);
 });
 
 test('reload package and get npm.prefix with env', async t => {
 	// eslint-disable-next-line camelcase
 	process.env.npm_config_PREFIX = '/usr/local/lib';
-	const {default: globalDirectories} = await importFresh('./index.js');
-	t.is(globalDirectories.npm.prefix, '/usr/local/lib');
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.npm.prefix, '/usr/local/lib');
 });
