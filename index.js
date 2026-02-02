@@ -70,39 +70,40 @@ const getNpmPrefix = () => {
 
 const npmPrefix = path.resolve(getNpmPrefix());
 
-const getYarnWindowsDirectory = () => {
-	if (isWindows && process.env.LOCALAPPDATA) {
-		const dir = path.join(process.env.LOCALAPPDATA, 'Yarn');
-		if (fs.existsSync(dir)) {
-			return dir;
-		}
+const getYarnHomeDirectory = () => {
+	if (process.getuid?.() === 0 && !process.env.FAKEROOTKEY) {
+		return '/usr/local/share';
 	}
 
-	return false;
+	return os.homedir();
 };
 
-const getYarnPrefix = () => {
+const getYarnDataDirectory = () => {
+	if (isWindows) {
+		return process.env.LOCALAPPDATA
+			? path.join(process.env.LOCALAPPDATA, 'Yarn/Data')
+			: path.join(os.homedir(), '.config/yarn');
+	}
+
+	if (process.env.XDG_DATA_HOME) {
+		return path.join(process.env.XDG_DATA_HOME, 'yarn');
+	}
+
+	return path.join(getYarnHomeDirectory(), '.config/yarn');
+};
+
+const getYarnBinPrefix = () => {
 	if (process.env.PREFIX) {
 		return process.env.PREFIX;
 	}
 
-	const windowsPrefix = getYarnWindowsDirectory();
-	if (windowsPrefix) {
-		return windowsPrefix;
+	if (isWindows) {
+		return process.env.LOCALAPPDATA
+			? path.join(process.env.LOCALAPPDATA, 'Yarn')
+			: path.join(os.homedir(), '.yarn');
 	}
 
-	const configPrefix = path.join(os.homedir(), '.config/yarn');
-	if (fs.existsSync(configPrefix)) {
-		return configPrefix;
-	}
-
-	const homePrefix = path.join(os.homedir(), '.yarn-config');
-	if (fs.existsSync(homePrefix)) {
-		return homePrefix;
-	}
-
-	// Yarn supports the npm conventions but the inverse is not true
-	return npmPrefix;
+	return `${process.env.DESTDIR ?? ''}/usr/local`;
 };
 
 const globalDirectory = {};
@@ -112,10 +113,10 @@ globalDirectory.npm.prefix = npmPrefix;
 globalDirectory.npm.packages = path.join(npmPrefix, isWindows ? 'node_modules' : 'lib/node_modules');
 globalDirectory.npm.binaries = isWindows ? npmPrefix : path.join(npmPrefix, 'bin');
 
-const yarnPrefix = path.resolve(getYarnPrefix());
+const yarnDataDir = path.resolve(getYarnDataDirectory());
 globalDirectory.yarn = {};
-globalDirectory.yarn.prefix = yarnPrefix;
-globalDirectory.yarn.packages = path.join(yarnPrefix, getYarnWindowsDirectory() ? 'Data/global/node_modules' : 'global/node_modules');
-globalDirectory.yarn.binaries = path.join(globalDirectory.yarn.packages, '.bin');
+globalDirectory.yarn.prefix = yarnDataDir;
+globalDirectory.yarn.packages = path.join(yarnDataDir, 'global/node_modules');
+globalDirectory.yarn.binaries = path.join(path.resolve(getYarnBinPrefix()), 'bin');
 
 export default globalDirectory;
