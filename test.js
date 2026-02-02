@@ -62,6 +62,26 @@ test.serial('yarn with PREFIX', async t => {
 	delete process.env.PREFIX;
 });
 
+test.serial('npm.prefix expands tilde in prefix', async t => {
+	const savedKeys = Object.keys(process.env).filter(name => name.toLowerCase() === 'npm_config_prefix');
+	const savedValues = Object.fromEntries(savedKeys.map(key => [key, process.env[key]]));
+
+	for (const key of savedKeys) {
+		delete process.env[key];
+	}
+
+	// eslint-disable-next-line camelcase
+	process.env.npm_config_prefix = '~/.npm-global';
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.npm.prefix, path.join(os.homedir(), '.npm-global'));
+	t.false(globalDirectory.npm.prefix.includes('~'));
+	delete process.env.npm_config_prefix;
+
+	for (const [key, value] of Object.entries(savedValues)) {
+		process.env[key] = value;
+	}
+});
+
 test.serial('reload package and get npm.prefix with env', async t => {
 	const savedKeys = Object.keys(process.env).filter(name => name.toLowerCase() === 'npm_config_prefix');
 	const savedValues = Object.fromEntries(savedKeys.map(key => [key, process.env[key]]));

@@ -6,6 +6,8 @@ import ini from 'ini';
 
 const isWindows = process.platform === 'win32';
 
+const untildify = pathWithTilde => pathWithTilde && pathWithTilde.startsWith('~') ? path.join(os.homedir(), pathWithTilde.slice(1)) : pathWithTilde;
+
 const readRc = filePath => {
 	try {
 		return ini.parse(fs.readFileSync(filePath, 'utf8')).prefix;
@@ -69,7 +71,7 @@ const getNpmPrefix = () => {
 	return getDefaultNpmPrefix();
 };
 
-const npmPrefix = path.resolve(getNpmPrefix());
+const npmPrefix = path.resolve(untildify(getNpmPrefix()));
 
 const getYarnHomeDirectory = () => {
 	if (process.getuid?.() === 0 && !process.env.FAKEROOTKEY) {
