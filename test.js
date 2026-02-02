@@ -4,7 +4,8 @@ import path from 'node:path';
 import test from 'ava';
 import {execa} from 'execa';
 
-const importFresh = async moduleName => import(`${moduleName}?${Date.now()}`);
+let importCounter = 0;
+const importFresh = async moduleName => import(`${moduleName}?${++importCounter}`);
 
 const {default: globalDirectory} = await importFresh('./index.js');
 
@@ -62,9 +63,20 @@ test.serial('yarn with PREFIX', async t => {
 });
 
 test.serial('reload package and get npm.prefix with env', async t => {
+	const savedKeys = Object.keys(process.env).filter(name => name.toLowerCase() === 'npm_config_prefix');
+	const savedValues = Object.fromEntries(savedKeys.map(key => [key, process.env[key]]));
+
+	for (const key of savedKeys) {
+		delete process.env[key];
+	}
+
 	// eslint-disable-next-line camelcase
 	process.env.npm_config_PREFIX = '/usr/local/lib';
 	const {default: globalDirectory} = await importFresh('./index.js');
 	t.is(globalDirectory.npm.prefix, '/usr/local/lib');
 	delete process.env.npm_config_PREFIX;
+
+	for (const [key, value] of Object.entries(savedValues)) {
+		process.env[key] = value;
+	}
 });

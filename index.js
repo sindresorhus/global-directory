@@ -12,9 +12,10 @@ const readRc = filePath => {
 	} catch {}
 };
 
-// TODO: Remove the `.reduce` call.
-// eslint-disable-next-line unicorn/no-array-reduce
-const getEnvNpmPrefix = () => Object.keys(process.env).reduce((prefix, name) => /^npm_config_prefix$/i.test(name) ? process.env[name] : prefix, undefined);
+const getEnvNpmPrefix = () => {
+	const key = Object.keys(process.env).find(name => name.toLowerCase() === 'npm_config_prefix');
+	return key ? process.env[key] : undefined;
+};
 
 const getGlobalNpmrc = () => {
 	if (isWindows && process.env.APPDATA) {
