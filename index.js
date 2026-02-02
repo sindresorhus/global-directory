@@ -44,6 +44,11 @@ const getDefaultNpmPrefix = () => {
 		return APPDATA ? path.join(APPDATA, 'npm') : path.dirname(process.execPath);
 	}
 
+	// Homebrew: `/opt/homebrew/Cellar/node/21.0.0/bin/node` → `/opt/homebrew`
+	if (process.execPath.includes('/Cellar/node')) {
+		return process.execPath.slice(0, process.execPath.indexOf('/Cellar/node'));
+	}
+
 	// `/usr/local/bin/node` → `prefix=/usr/local`
 	return path.dirname(path.dirname(process.execPath));
 };
