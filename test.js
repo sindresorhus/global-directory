@@ -72,7 +72,7 @@ test('pnpm', t => {
 
 test('pnpm.packages is inside prefix', t => {
 	t.true(globalDirectory.pnpm.packages.startsWith(globalDirectory.pnpm.prefix));
-	t.true(globalDirectory.pnpm.packages.endsWith('/global/5/node_modules') || globalDirectory.pnpm.packages.endsWith('\\global\\5\\node_modules'));
+	t.true(globalDirectory.pnpm.packages.endsWith('/global/5/node_modules') || globalDirectory.pnpm.packages.endsWith(String.raw`\global\5\node_modules`));
 });
 
 test.serial('pnpm with PNPM_HOME', async t => {
