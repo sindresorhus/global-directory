@@ -8,15 +8,20 @@ const isWindows = process.platform === 'win32';
 
 const untildify = pathWithTilde => pathWithTilde && pathWithTilde.startsWith('~') ? path.join(os.homedir(), pathWithTilde.slice(1)) : pathWithTilde;
 
-const readRc = filePath => {
+const readConfigValue = (filePath, key) => {
+	if (!filePath) {
+		return;
+	}
+
 	try {
-		return ini.parse(fs.readFileSync(filePath, 'utf8')).prefix;
+		return ini.parse(fs.readFileSync(filePath, 'utf8'))[key];
 	} catch {}
 };
 
-const getEnvNpmPrefix = () => {
-	const key = Object.keys(process.env).find(name => name.toLowerCase() === 'npm_config_prefix');
-	return key ? process.env[key] : undefined;
+const getEnvironmentNpmConfigValue = key => {
+	const normalizedKey = `npm_config_${key.replaceAll('-', '_')}`.toLowerCase();
+	const environmentKey = Object.keys(process.env).find(name => name.toLowerCase() === normalizedKey);
+	return environmentKey ? process.env[environmentKey] : undefined;
 };
 
 const getGlobalNpmrc = () => {
@@ -54,13 +59,13 @@ const getDefaultNpmPrefix = () => {
 };
 
 const getNpmPrefix = () => {
-	const envPrefix = getEnvNpmPrefix();
-	if (envPrefix) {
-		return envPrefix;
+	const environmentPrefix = getEnvironmentNpmConfigValue('prefix');
+	if (environmentPrefix !== undefined) {
+		return environmentPrefix;
 	}
 
-	const homePrefix = readRc(path.join(os.homedir(), '.npmrc'));
-	if (homePrefix) {
+	const homePrefix = readConfigValue(path.join(os.homedir(), '.npmrc'), 'prefix');
+	if (homePrefix !== undefined) {
 		return homePrefix;
 	}
 
@@ -68,8 +73,8 @@ const getNpmPrefix = () => {
 		return process.env.PREFIX;
 	}
 
-	const globalPrefix = readRc(getGlobalNpmrc());
-	if (globalPrefix) {
+	const globalPrefix = readConfigValue(getGlobalNpmrc(), 'prefix');
+	if (globalPrefix !== undefined) {
 		return globalPrefix;
 	}
 
@@ -126,5 +131,78 @@ globalDirectory.yarn = {};
 globalDirectory.yarn.prefix = yarnDataDir;
 globalDirectory.yarn.packages = path.join(yarnDataDir, 'global/node_modules');
 globalDirectory.yarn.binaries = path.join(path.resolve(getYarnBinPrefix()), 'bin');
+
+const getPnpmDataDirectory = () => {
+	if (process.env.PNPM_HOME) {
+		return process.env.PNPM_HOME;
+	}
+
+	if (process.env.XDG_DATA_HOME) {
+		return path.join(process.env.XDG_DATA_HOME, 'pnpm');
+	}
+
+	if (process.platform === 'darwin') {
+		return path.join(os.homedir(), 'Library/pnpm');
+	}
+
+	if (!isWindows) {
+		return path.join(os.homedir(), '.local/share/pnpm');
+	}
+
+	if (process.env.LOCALAPPDATA) {
+		return path.join(process.env.LOCALAPPDATA, 'pnpm');
+	}
+
+	return path.join(os.homedir(), '.pnpm');
+};
+
+const getPnpmConfigFilePath = () => {
+	if (process.env.XDG_CONFIG_HOME) {
+		return path.join(process.env.XDG_CONFIG_HOME, 'pnpm', 'rc');
+	}
+
+	if (isWindows) {
+		const localConfigHome = process.env.LOCALAPPDATA ?? path.join(os.homedir(), 'AppData', 'Local');
+		return path.join(localConfigHome, 'pnpm', 'config', 'rc');
+	}
+
+	if (process.platform === 'darwin') {
+		return path.join(os.homedir(), 'Library', 'Preferences', 'pnpm', 'rc');
+	}
+
+	return path.join(os.homedir(), '.config', 'pnpm', 'rc');
+};
+
+const getPnpmConfigValue = key => {
+	const environmentValue = getEnvironmentNpmConfigValue(key);
+	if (environmentValue !== undefined) {
+		return environmentValue;
+	}
+
+	const pnpmGlobalValue = readConfigValue(getPnpmConfigFilePath(), key);
+	if (pnpmGlobalValue !== undefined) {
+		return pnpmGlobalValue;
+	}
+
+	const homeValue = readConfigValue(path.join(os.homedir(), '.npmrc'), key);
+	if (homeValue !== undefined) {
+		return homeValue;
+	}
+
+	const globalValue = readConfigValue(getGlobalNpmrc(), key);
+	if (globalValue !== undefined) {
+		return globalValue;
+	}
+};
+
+const pnpmDataDir = path.resolve(getPnpmDataDirectory());
+const pnpmGlobalDir = getPnpmConfigValue('global-dir');
+const pnpmGlobalBinDir = getPnpmConfigValue('global-bin-dir');
+const resolvedPnpmGlobalDir = path.resolve(untildify(pnpmGlobalDir ?? path.join(pnpmDataDir, 'global')));
+const resolvedPnpmGlobalBinDir = path.resolve(untildify(pnpmGlobalBinDir ?? pnpmDataDir));
+globalDirectory.pnpm = {};
+globalDirectory.pnpm.prefix = pnpmDataDir;
+globalDirectory.pnpm.packages = path.join(resolvedPnpmGlobalDir, '5/node_modules');
+globalDirectory.pnpm.binaries = resolvedPnpmGlobalBinDir;
 
 export default globalDirectory;

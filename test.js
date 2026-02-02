@@ -1,6 +1,7 @@
 import process from 'node:process';
 import os from 'node:os';
 import path from 'node:path';
+import fs from 'node:fs';
 import test from 'ava';
 import {execa} from 'execa';
 
@@ -60,6 +61,90 @@ test.serial('yarn with PREFIX', async t => {
 	// PREFIX should not affect the data directory
 	t.is(globalDirectory.yarn.prefix, path.join(os.homedir(), '.config/yarn'));
 	delete process.env.PREFIX;
+});
+
+test('pnpm', t => {
+	t.truthy(globalDirectory.pnpm);
+	t.truthy(globalDirectory.pnpm.prefix);
+	t.truthy(globalDirectory.pnpm.packages);
+	t.truthy(globalDirectory.pnpm.binaries);
+});
+
+test('pnpm.packages is inside prefix', t => {
+	t.true(globalDirectory.pnpm.packages.startsWith(globalDirectory.pnpm.prefix));
+	t.true(globalDirectory.pnpm.packages.endsWith('/global/5/node_modules') || globalDirectory.pnpm.packages.endsWith('\\global\\5\\node_modules'));
+});
+
+test.serial('pnpm with PNPM_HOME', async t => {
+	process.env.PNPM_HOME = '/custom/pnpm-home';
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.pnpm.prefix, '/custom/pnpm-home');
+	t.is(globalDirectory.pnpm.packages, '/custom/pnpm-home/global/5/node_modules');
+	t.is(globalDirectory.pnpm.binaries, '/custom/pnpm-home');
+	delete process.env.PNPM_HOME;
+});
+
+test.serial('pnpm with NPM_CONFIG_GLOBAL_DIR', async t => {
+	const savedGlobalDirectory = process.env.NPM_CONFIG_GLOBAL_DIR;
+	process.env.NPM_CONFIG_GLOBAL_DIR = '/custom/pnpm-global';
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.pnpm.packages, path.join('/custom/pnpm-global', '5/node_modules'));
+
+	if (savedGlobalDirectory === undefined) {
+		delete process.env.NPM_CONFIG_GLOBAL_DIR;
+	} else {
+		process.env.NPM_CONFIG_GLOBAL_DIR = savedGlobalDirectory;
+	}
+});
+
+test.serial('pnpm with NPM_CONFIG_GLOBAL_BIN_DIR', async t => {
+	const savedGlobalBinDirectory = process.env.NPM_CONFIG_GLOBAL_BIN_DIR;
+	process.env.NPM_CONFIG_GLOBAL_BIN_DIR = '/custom/pnpm-bin';
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.pnpm.binaries, '/custom/pnpm-bin');
+
+	if (savedGlobalBinDirectory === undefined) {
+		delete process.env.NPM_CONFIG_GLOBAL_BIN_DIR;
+	} else {
+		process.env.NPM_CONFIG_GLOBAL_BIN_DIR = savedGlobalBinDirectory;
+	}
+});
+
+test.serial('pnpm with pnpm rc config', async t => {
+	const savedXdgConfigHome = process.env.XDG_CONFIG_HOME;
+	const temporaryDirectory = path.join(process.cwd(), 'tmp');
+	fs.mkdirSync(temporaryDirectory, {recursive: true});
+	const configHome = fs.mkdtempSync(path.join(temporaryDirectory, 'pnpm-config-'));
+	const pnpmConfigFile = path.join(configHome, 'pnpm', 'rc');
+	fs.mkdirSync(path.dirname(pnpmConfigFile), {recursive: true});
+	fs.writeFileSync(pnpmConfigFile, 'global-dir=/custom/pnpm-global\nglobal-bin-dir=/custom/pnpm-bin\n');
+	process.env.XDG_CONFIG_HOME = configHome;
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.pnpm.packages, path.join('/custom/pnpm-global', '5/node_modules'));
+	t.is(globalDirectory.pnpm.binaries, '/custom/pnpm-bin');
+	fs.rmSync(configHome, {recursive: true, force: true});
+
+	if (savedXdgConfigHome === undefined) {
+		delete process.env.XDG_CONFIG_HOME;
+	} else {
+		process.env.XDG_CONFIG_HOME = savedXdgConfigHome;
+	}
+});
+
+test.serial('pnpm with XDG_DATA_HOME', async t => {
+	delete process.env.PNPM_HOME;
+	process.env.XDG_DATA_HOME = '/tmp/xdg-test';
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.pnpm.prefix, '/tmp/xdg-test/pnpm');
+	t.is(globalDirectory.pnpm.packages, '/tmp/xdg-test/pnpm/global/5/node_modules');
+	delete process.env.XDG_DATA_HOME;
+});
+
+test.serial('pnpm without PNPM_HOME uses data dir for binaries', async t => {
+	delete process.env.PNPM_HOME;
+	delete process.env.XDG_DATA_HOME;
+	const {default: globalDirectory} = await importFresh('./index.js');
+	t.is(globalDirectory.pnpm.binaries, globalDirectory.pnpm.prefix);
 });
 
 test.serial('npm.prefix expands tilde in prefix', async t => {

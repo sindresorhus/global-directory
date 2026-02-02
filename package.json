@@ -33,6 +33,7 @@
 		"paths",
 		"npm",
 		"yarn",
+		"pnpm",
 		"node",
 		"modules",
 		"node-modules",

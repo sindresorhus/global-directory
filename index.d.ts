@@ -53,6 +53,22 @@ declare const globalDirectory: {
 	```
 	*/
 	readonly yarn: GlobalDirectory;
+
+	/**
+	Get the directory of globally installed packages and binaries.
+
+	@example
+	```
+	import globalDirectory from 'global-directory';
+
+	console.log(globalDirectory.pnpm.prefix);
+	//=> '/Users/sindresorhus/Library/pnpm'
+
+	console.log(globalDirectory.pnpm.packages);
+	//=> '/Users/sindresorhus/Library/pnpm/global/5/node_modules'
+	```
+	*/
+	readonly pnpm: GlobalDirectory;
 };
 
 export default globalDirectory;

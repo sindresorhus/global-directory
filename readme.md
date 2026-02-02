@@ -2,7 +2,7 @@
 
 > Get the directory of globally installed packages and binaries
 
-Uses the same resolution logic as `npm` and `yarn`.
+Uses the same resolution logic as `npm`, `yarn`, and `pnpm`.
 
 ## Install
 
@@ -26,6 +26,12 @@ console.log(globalDirectory.npm.binaries);
 
 console.log(globalDirectory.yarn.packages);
 //=> '/Users/sindresorhus/.config/yarn/global/node_modules'
+
+console.log(globalDirectory.pnpm.prefix);
+//=> '/Users/sindresorhus/Library/pnpm'
+
+console.log(globalDirectory.pnpm.packages);
+//=> '/Users/sindresorhus/Library/pnpm/global/5/node_modules'
 ```
 
 ## API
@@ -34,6 +40,7 @@ console.log(globalDirectory.yarn.packages);
 
 #### npm
 #### yarn
+#### pnpm
 
 ##### packages
 
